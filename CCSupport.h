@@ -54,6 +54,7 @@ enum
 
 @interface CCSModuleRepository (CCSupport)
 - (NSArray*)ccshook_loadAllModuleMetadataWithOrig:(NSArray*)orig;
+- (NSArray*)ccshook_loadAllModuleMetadata_Simulator;
 @end
 
 

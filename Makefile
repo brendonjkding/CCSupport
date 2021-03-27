@@ -1,5 +1,8 @@
 export XCODE_12_SLICE ?= 0
 
+ifdef SIMULATOR
+export TARGET = simulator:clang:13.2:11.0
+else
 export TARGET = iphone:clang:13.0:11.0
 
 ifeq ($(XCODE_12_SLICE), 1)
@@ -7,6 +10,7 @@ ifeq ($(XCODE_12_SLICE), 1)
 else
 	export ARCHS = arm64 arm64e
 	export PREFIX = $(THEOS)/toolchain/Xcode11.xctoolchain/usr/bin/
+endif
 endif
 
 export ROOTLESS ?= 0
@@ -27,3 +31,6 @@ after-install::
 	install.exec "killall -9 SpringBoard"
 
 include $(THEOS_MAKE_PATH)/aggregate.mk
+
+setup::
+	@mkdir -p /var/mobile/Library/ControlCenter

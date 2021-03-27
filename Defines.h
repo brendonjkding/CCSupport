@@ -1,9 +1,15 @@
-#define CCSupportBundlePath @"/Library/Application Support/CCSupport"
+#if TARGET_OS_SIMULATOR
+#define RootPath "/opt/simject"
+#else
+#define RootPath
+#endif
+
+#define CCSupportBundlePath @RootPath"/Library/Application Support/CCSupport"
 #define DefaultModuleConfigurationPath @"/var/mobile/Library/ControlCenter/ModuleConfiguration.plist"
 #define CCSupportModuleConfigurationPath @"/var/mobile/Library/ControlCenter/ModuleConfiguration_CCSupport.plist"
 #define DefaultModuleOrderPath @"/System/Library/PrivateFrameworks/ControlCenterServices.framework/DefaultModuleOrder~%@.plist"
 
-#define ProviderBundlesPath @"/Library/ControlCenter/CCSupport_Providers"
+#define ProviderBundlesPath @RootPath"/Library/ControlCenter/CCSupport_Providers"
 
 #ifndef kCFCoreFoundationVersionNumber_iOS_11_0
 #define kCFCoreFoundationVersionNumber_iOS_11_0 1443.00

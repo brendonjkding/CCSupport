@@ -1,6 +1,7 @@
 #import "CCSupport.h"
 #import "Defines.h"
 
+#import <substrate.h>
 #import <Preferences/PSListController.h>
 #import <Preferences/PSSpecifier.h>
 
@@ -390,6 +391,8 @@ BOOL loadFixedModuleIdentifiers()
 	{
     #ifdef ROOTLESS
 		NSURL* thirdPartyURL = [NSURL fileURLWithPath:[[directories.firstObject path] stringByReplacingOccurrencesOfString:@"/System/Library" withString:@"/var/LIB"] isDirectory:YES];
+    #elif TARGET_OS_SIMULATOR
+        NSURL* thirdPartyURL = [NSURL fileURLWithPath:@"/opt/simject/Library/ControlCenter/Bundles/" isDirectory:YES];
     #else
 		NSURL* thirdPartyURL = [NSURL fileURLWithPath:[[directories.firstObject path] stringByReplacingOccurrencesOfString:@"/System" withString:@""] isDirectory:YES];
     #endif
@@ -459,16 +462,52 @@ BOOL loadFixedModuleIdentifiers()
 
 - (NSArray*)_queue_loadAllModuleMetadata //iOS 12+
 {
-	NSArray* orig = %orig;
+    NSArray* orig;
+    #if TARGET_OS_SIMULATOR
+    orig = [self ccshook_loadAllModuleMetadata_Simulator];
+    #else
+    orig = %orig;
+    #endif
 	return [self ccshook_loadAllModuleMetadataWithOrig:orig];
 }
 
 - (NSArray*)_loadAllModuleMetadata //iOS 11
 {
-	NSArray* orig = %orig;
+	NSArray* orig;
+    #if TARGET_OS_SIMULATOR
+    orig = [self ccshook_loadAllModuleMetadata_Simulator];
+    #else
+    orig = %orig;
+    #endif
 	return [self ccshook_loadAllModuleMetadataWithOrig:orig];
 }
 
+%new
+- (NSArray*)ccshook_loadAllModuleMetadata_Simulator
+{
+    NSMutableArray* metadatas = [NSMutableArray new];
+    NSArray* _directoryURLs = MSHookIvar<NSArray*>(self, "_directoryURLs");
+
+    for(NSURL* _directoryURL in _directoryURLs){
+        NSArray<NSString*>* contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:[_directoryURL path] error:nil];
+        for(NSString* content in contents){
+            NSURL *url = [NSURL URLWithString:content relativeToURL:_directoryURL];
+            CCSModuleMetadata* metadata = [objc_getClass("CCSModuleMetadata") metadataForBundleAtURL:url];
+            if(metadata){
+                [metadatas addObject:metadata];
+            }
+        }
+    }
+    return metadatas;
+}
+%end
+
+//Fix crash (Simulator, iOS <=13)
+%hook MPAVEndpointRoutingDataSource
+-(void)setRoutingContextUID:(NSString *)arg1{
+    if(!arg1) arg1=@"00000000-0000-0000-0000-000000000000";
+    return %orig;
+}
 %end
 
 %hook CCSModuleSettingsProvider
