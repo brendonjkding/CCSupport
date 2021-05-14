@@ -1,7 +1,7 @@
 export XCODE_12_SLICE ?= 0
 
 ifdef SIMULATOR
-export TARGET = simulator:clang:13.2:11.0
+export TARGET = simulator:clang:latest:11.0
 else
 export TARGET = iphone:clang:13.0:11.0
 
@@ -33,4 +33,5 @@ after-install::
 include $(THEOS_MAKE_PATH)/aggregate.mk
 
 setup::
-	@mkdir -p /var/mobile/Library/ControlCenter
+	@sudo mkdir -p /var/mobile/Library/ControlCenter
+	@sudo chmod -R 777 /var/mobile
