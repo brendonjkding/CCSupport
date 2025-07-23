@@ -1365,7 +1365,7 @@ static void bundleLoaded(CFNotificationCenterRef center, void *observer, CFStrin
 			// Notification to reload sizes without respring
 			CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, reloadModuleSizes, CFSTR("com.opa334.ccsupport/ReloadSizes"), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
 		}
-		else {
+		else if(@available(iOS 11, *)){
 			// Safety checks failed
 			%init(safetyChecksFailed);
 		}
