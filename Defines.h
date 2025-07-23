@@ -5,7 +5,11 @@
 #endif
 
 #define DefaultModuleConfigurationPath @"/var/mobile/Library/ControlCenter/ModuleConfiguration.plist"
+#if TARGET_OS_SIMULATOR
+#define CCSupportModuleConfigurationPath [NSString stringWithFormat:@"/var/mobile/Library/ControlCenter/ModuleConfiguration_CCSupport_%@.plist", UIDevice.currentDevice.systemVersion]
+#else
 #define CCSupportModuleConfigurationPath @RootPath@"/var/mobile/Library/ControlCenter/ModuleConfiguration_CCSupport.plist"
+#endif
 #define DefaultModuleOrderPath @"/System/Library/PrivateFrameworks/ControlCenterServices.framework/DefaultModuleOrder~%@.plist"
 
 #define CCSupportBundlePath @RootPath@"/Library/Application Support/CCSupport"
