@@ -10,8 +10,6 @@ endif
 
 INSTALL_TARGET_PROCESSES = SpringBoard Preferences
 
-include $(THEOS)/makefiles/common.mk
-
 TWEAK_NAME = CCSupport
 CCSupport_CFLAGS = -fobjc-arc
 CCSupport_FILES = $(wildcard *.xm *.m)
@@ -21,6 +19,7 @@ ifneq ($(THEOS_PACKAGE_SCHEME),rootless)
 CCSupport_CFLAGS += -D XINA_SUPPORT=1
 endif
 
+include $(THEOS)/makefiles/common.mk
 include $(THEOS_MAKE_PATH)/tweak.mk
 
 SUBPROJECTS += HomeProvider
