@@ -4,25 +4,20 @@
 #define RootPath
 #endif
 
-#define CCSupportBundlePath @RootPath"/Library/Application Support/CCSupport"
 #define DefaultModuleConfigurationPath @"/var/mobile/Library/ControlCenter/ModuleConfiguration.plist"
-#define CCSupportModuleConfigurationPath @"/var/mobile/Library/ControlCenter/ModuleConfiguration_CCSupport.plist"
+#define CCSupportModuleConfigurationPath @RootPath@"/var/mobile/Library/ControlCenter/ModuleConfiguration_CCSupport.plist"
 #define DefaultModuleOrderPath @"/System/Library/PrivateFrameworks/ControlCenterServices.framework/DefaultModuleOrder~%@.plist"
 
-#define ProviderBundlesPath @RootPath"/Library/ControlCenter/CCSupport_Providers"
+#define CCSupportBundlePath @RootPath@"/Library/Application Support/CCSupport"
+#define CCSupportModulesPath @RootPath@"/Library/ControlCenter/Bundles"
+#define CCSupportProvidersPath @RootPath@"/Library/ControlCenter/CCSupport_Providers"
 
-#ifndef kCFCoreFoundationVersionNumber_iOS_11_0
-#define kCFCoreFoundationVersionNumber_iOS_11_0 1443.00
+#define iOS15_WhitelistedFixedModuleIdentifiers @[@"com.apple.replaykit.AudioConferenceControlCenterModule", @"com.apple.replaykit.VideoConferenceControlCenterModule"]
+
+#ifndef kCFCoreFoundationVersionNumber_iOS_15_0
+#define kCFCoreFoundationVersionNumber_iOS_15_0 1854
 #endif
 
-#ifndef kCFCoreFoundationVersionNumber_iOS_12_0
-#define kCFCoreFoundationVersionNumber_iOS_12_0 1556.00
-#endif
-
-#ifndef kCFCoreFoundationVersionNumber_iOS_13_0
-#define kCFCoreFoundationVersionNumber_iOS_13_0 1665.15
-#endif
-
-#ifndef kCFCoreFoundationVersionNumber_iOS_14_0
-#define kCFCoreFoundationVersionNumber_iOS_14_0 1751.108
+#ifndef kCFCoreFoundationVersionNumber_iOS_16_0
+#define kCFCoreFoundationVersionNumber_iOS_16_0 1932.101
 #endif

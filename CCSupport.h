@@ -1,3 +1,24 @@
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+#import <Preferences/PSListController.h>
+
+#import <ControlCenterUI/CCUIModuleSettings.h>
+#import <ControlCenterUI/CCUIModuleInstance.h>
+#import <ControlCenterUI/CCUIModuleInstanceManager.h>
+#import <ControlCenterUI/CCUIModuleCollectionViewController.h>
+#import <ControlCenterUI/CCUIModularControlCenterViewController.h>
+#import <ControlCenterUI/CCUIModuleSettingsManager.h>
+#import <ControlCenterUI/CCUIContentModuleContainerViewController.h>
+
+#import <ControlCenterServices/CCSModuleMetadata.h>
+#import <ControlCenterServices/CCSModuleRepository.h>
+#import <ControlCenterServices/CCSModuleSettingsProvider.h>
+
+#import <ControlCenterUIKit/CCUIContentModuleContext.h>
+#import <ControlCenterUIKit/CCUIContentModule.h>
+
+#import "CCSModuleProvider.h"
+
 #if defined __cplusplus
 extern "C" {
 #endif
@@ -14,18 +35,6 @@ enum
 	CCOrientationLandscape = 1
 };
 
-#import <Preferences/PSListController.h>
-
-#import <ControlCenterUI/CCUIModuleSettings.h>
-#import <ControlCenterUI/CCUIModuleInstance.h>
-#import <ControlCenterUI/CCUIModuleInstanceManager.h>
-#import <ControlCenterUI/CCUIModuleCollectionViewController.h>
-#import <ControlCenterUI/CCUIModularControlCenterViewController.h>
-#import <ControlCenterUI/CCUIModuleSettingsManager.h>
-
-#import <ControlCenterServices/CCSModuleMetadata.h>
-#import <ControlCenterServices/CCSModuleRepository.h>
-#import <ControlCenterServices/CCSModuleSettingsProvider.h>
 
 @protocol DynamicSizeModule
 @optional
@@ -33,7 +42,7 @@ enum
 @end
 
 @interface CCUIModuleInstanceManager (CCSupport)
-- (CCUIModuleInstance*)instanceForModuleIdentifier:(NSString*)moduleIdentifier;
+- (CCUIModuleInstance *)instanceForModuleIdentifier:(NSString *)moduleIdentifier;
 @end
 
 @interface CCUIModuleSettings (CCSupport)
@@ -45,6 +54,7 @@ enum
 @end
 
 @interface CCUISettingsModuleDescription : NSObject
+- (void)ccs_applyModificationsForIdentifier:(NSString *)identifier displayName:(NSString* *)displayName iconImage:(UIImage* *)iconImage;
 @property(readonly, copy, nonatomic) NSString *displayName;
 @end
 
@@ -53,8 +63,8 @@ enum
 @end
 
 @interface CCSModuleRepository (CCSupport)
-- (NSArray*)ccshook_loadAllModuleMetadataWithOrig:(NSArray*)orig;
-- (NSArray*)ccshook_loadAllModuleMetadata_Simulator;
+- (NSArray *)ccshook_loadAllModuleMetadataWithOrig:(NSArray*)orig;
+- (NSArray *)ccshook_loadAllModuleMetadata_Simulator;
 @end
 
 
@@ -62,14 +72,14 @@ enum
 //CCUISettingsListController on iOS 13
 
 @protocol SettingsControllerSharedAcrossVersions
-@property(nonatomic) NSDictionary* fixedModuleIcons; //NEW
+@property(nonatomic) NSDictionary* ccsp_additionalModuleIcons; //NEW
 @property(nonatomic, retain) NSDictionary* preferenceClassForModuleIdentifiers; //NEW
 - (void)_repopulateModuleData;
 - (id)_identifierAtIndexPath:(id)arg1;
-- (UITableView*)ccs_getTableView;
+- (UITableView *)ccs_getTableView;
 - (void)ccs_unselectSelectedRow;
 - (void)ccs_resetButtonPressed;
-- (CCUISettingsModuleDescription*)_descriptionForIdentifier:(NSString*)identifier;
+- (CCUISettingsModuleDescription *)_descriptionForIdentifier:(NSString *)identifier;
 @end
 
 @interface CCUISettingsModulesController : UITableViewController <SettingsControllerSharedAcrossVersions>
@@ -81,46 +91,29 @@ enum
 @interface SBHomeScreenViewController : UIViewController
 @end
 
-@protocol CCSModuleProvider
-@required
-- (NSUInteger)numberOfProvidedModules;
-- (NSString*)identifierForModuleAtIndex:(NSUInteger)index;
-
-- (id)moduleInstanceForModuleIdentifier:(NSString*)identifier;
-- (NSString*)displayNameForModuleIdentifier:(NSString*)identifier;
-@optional
-- (NSSet*)supportedDeviceFamiliesForModuleWithIdentifier:(NSString*)identifier;
-- (NSSet*)requiredDeviceCapabilitiesForModuleWithIdentifier:(NSString*)identifier;
-- (NSString*)associatedBundleIdentifierForModuleWithIdentifier:(NSString*)identifier;
-- (NSString*)associatedBundleMinimumVersionForModuleWithIdentifier:(NSString*)identifier;
-- (NSUInteger)visibilityPreferenceForModuleWithIdentifier:(NSString*)identifier;
-- (UIImage*)settingsIconForModuleIdentifier:(NSString*)identifier;
-- (BOOL)providesListControllerForModuleIdentifier:(NSString*)identifier;
-- (id)listControllerForModuleIdentifier:(NSString*)identifier;
-@end
-
-@interface CCSProvidedModuleBundle : NSBundle
-@property (nonatomic) NSString* moduleDisplayName;
-@end
-
 @interface CCSModuleProviderManager : NSObject
 @property (nonatomic) NSDictionary* moduleProvidersByIdentifier;
 @property (nonatomic) NSDictionary* providerToModuleCache;
 + (instancetype)sharedInstance;
 - (void)_reloadProviders;
 - (void)_populateProviderToModuleCache;
-- (NSObject<CCSModuleProvider>*)_moduleProviderForModuleWithIdentifier:(NSString*)moduleIdentifier;
-- (CCSModuleMetadata*)_metadataForProvidedModuleWithIdentifier:(NSString*)identifier fromProvider:(NSObject<CCSModuleProvider>*)provider;
-- (NSMutableSet*)_allProvidedModuleIdentifiers;
-- (BOOL)doesProvideModule:(NSString*)moduleIdentifier;
-- (NSMutableArray*)metadataForAllProvidedModules;
-- (id)moduleInstanceForModuleIdentifier:(NSString*)identifier;
-- (BOOL)providesListControllerForModuleIdentifier:(NSString*)identifier;
-- (id)listControllerForModuleIdentifier:(NSString*)identifier;
-- (NSString*)displayNameForModuleIdentifier:(NSString*)identifier;
-- (UIImage*)settingsIconForModuleIdentifier:(NSString*)identifier;
+- (NSObject<CCSModuleProvider> *)_moduleProviderForModuleWithIdentifier:(NSString *)moduleIdentifier;
+- (CCSModuleMetadata *)_metadataForProvidedModuleWithIdentifier:(NSString *)identifier fromProvider:(NSObject<CCSModuleProvider> *)provider;
+- (NSMutableSet *)_allProvidedModuleIdentifiers;
+- (BOOL)doesProvideModule:(NSString *)moduleIdentifier;
+- (NSMutableArray *)metadataForAllProvidedModules;
+- (id)moduleInstanceForModuleIdentifier:(NSString *)identifier;
+- (BOOL)providesListControllerForModuleIdentifier:(NSString *)identifier;
+- (id)listControllerForModuleIdentifier:(NSString *)identifier;
+- (NSString *)displayNameForModuleIdentifier:(NSString *)identifier;
+- (UIImage *)settingsIconForModuleIdentifier:(NSString *)identifier;
 - (void)reload;
 @end
 
 @interface CCSProvidedListController : NSObject //placeholder
+@end
+
+@interface NSValue (ControlCenterUI)
++ (NSValue *)ccui_valueWithLayoutSize:(CCUILayoutSize)layoutSize;
+- (CCUILayoutSize)ccui_sizeValue;
 @end

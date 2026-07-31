@@ -1,35 +1,29 @@
-export XCODE_12_SLICE ?= 0
-
 ifdef SIMULATOR
 export TARGET = simulator:clang:latest:11.0
 else
-export TARGET = iphone:clang:13.0:11.0
-
-ifeq ($(XCODE_12_SLICE), 1)
-	export ARCHS = arm64e
+ifeq ($(THEOS_PACKAGE_SCHEME),rootless)
+TARGET := iphone:clang:16.5:15.0
 else
-	export ARCHS = arm64 arm64e
-	export PREFIX = $(THEOS)/toolchain/Xcode11.xctoolchain/usr/bin/
+TARGET := iphone:clang:14.5:11.0
 endif
 endif
 
-export ROOTLESS ?= 0
+INSTALL_TARGET_PROCESSES = SpringBoard Preferences
 
 include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = CCSupport
 CCSupport_CFLAGS = -fobjc-arc
-ifeq ($(ROOTLESS), 1)
-	CCSupport_CFLAGS += -fobjc-arc -D ROOTLESS=1
-endif
-CCSupport_FILES = Tweak.xm
+CCSupport_FILES = $(wildcard *.xm *.m)
 CCSupport_PRIVATE_FRAMEWORKS = MobileIcons Preferences
+
+ifneq ($(THEOS_PACKAGE_SCHEME),rootless)
+CCSupport_CFLAGS += -D XINA_SUPPORT=1
+endif
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 
-after-install::
-	install.exec "killall -9 SpringBoard"
-
+SUBPROJECTS += HomeProvider
 include $(THEOS_MAKE_PATH)/aggregate.mk
 
 setup::
